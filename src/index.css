@@ -1,33 +1,58 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+@import "tailwindcss";
+
+/* Design tokens. Values below are the light palette (safe default before a
+   theme preference is known); dark is layered on top via prefers-color-scheme
+   (pre-login) and [data-theme="dark"] (post-login, ThemeProvider-driven).
+   The neutral scale (background/surface/border/foreground) carries a faint
+   purple hue (258) at low saturation rather than pure gray - a purple
+   "undertone" across the whole UI, with --color-accent reserved as the one
+   saturated, darker purple used sparingly for actual interactive state. */
+@theme {
+  --color-background: hsl(258, 25%, 99%);
+  --color-surface: hsl(258, 18%, 96%);
+  --color-surface-hover: hsl(258, 14%, 91%);
+  --color-border: hsl(258, 10%, 87%);
+  --color-foreground: hsl(258, 15%, 11%);
+  --color-muted-foreground: hsl(258, 8%, 42%);
+  --color-accent: hsl(262, 45%, 38%);
+  --color-accent-hover: hsl(262, 48%, 30%);
+  --color-accent-foreground: #ffffff;
+  --font-sans: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-background: hsl(258, 12%, 7%);
+    --color-surface: hsl(258, 10%, 11%);
+    --color-surface-hover: hsl(258, 10%, 15%);
+    --color-border: hsl(258, 8%, 20%);
+    --color-foreground: hsl(258, 10%, 95%);
+    --color-muted-foreground: hsl(258, 6%, 63%);
+    --color-accent: hsl(262, 45%, 42%);
+    --color-accent-hover: hsl(262, 48%, 34%);
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-background: hsl(258, 12%, 7%);
+  --color-surface: hsl(258, 10%, 11%);
+  --color-surface-hover: hsl(258, 10%, 15%);
+  --color-border: hsl(258, 8%, 20%);
+  --color-foreground: hsl(258, 10%, 95%);
+  --color-muted-foreground: hsl(258, 6%, 63%);
+  --color-accent: hsl(262, 45%, 42%);
+  --color-accent-hover: hsl(262, 48%, 34%);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
   line-height: 1.5;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.87);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-.box:nth-child(3n + 1) {
-  grid-column: 1;
-}
-
-.box:nth-child(3n + 2) {
-  grid-column: 2;
-}
-
-.box:nth-child(3n + 3) {
-  grid-column: 3;
 }
