@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FC, type FormEvent } from "react";
 import {
   Authenticator,
   Button,
@@ -17,66 +17,77 @@ import { getUrl } from "aws-amplify/storage";
 import { uploadData } from "aws-amplify/storage";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
+import type { Schema } from "../amplify/data/resource";
 
-/**
- * @type {import('aws-amplify/data').Client<import('../amplify/data/resource').Schema>}
- */
+interface Note {
+  id: string;
+  name: string | null;
+  description: string | null;
+  image: string | null;
+  owner: string | null;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+interface DeleteNoteParams {
+  id: string;
+}
 
 Amplify.configure(outputs);
-const client = generateClient({
+const client = generateClient<Schema>({
   authMode: "userPool",
 });
 
-export default function App() {
-  const [notes, setNotes] = useState([]);
+const App: FC = () => {
+  const [notes, setNotes] = useState<Note[]>([]);
 
   useEffect(() => {
     fetchNotes();
   }, []);
 
-  async function fetchNotes() {
+  const fetchNotes = async (): Promise<void> => {
     const { data: notes } = await client.models.Note.list();
-    await Promise.all(
-      notes.map(async (note) => {
+    const notesWithUrls = await Promise.all(
+      notes.map(async (note: Note) => {
         if (note.image) {
           const linkToStorageFile = await getUrl({
             path: ({ identityId }) => `media/${identityId}/${note.image}`,
           });
           console.log(linkToStorageFile.url);
-          note.image = linkToStorageFile.url;
+          note.image = String(linkToStorageFile.url);
         }
         return note;
       })
     );
-    console.log(notes);
-    setNotes(notes);
-  }
+    console.log(notesWithUrls);
+    setNotes(notesWithUrls);
+  };
 
-  async function createNote(event) {
+  const createNote = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const form = new FormData(event.target);
-    console.log(form.get("image").name);
+    const form = new FormData(event.target as HTMLFormElement);
+    const imageFile = form.get("image") as File;
+    console.log(imageFile.name);
 
     const { data: newNote } = await client.models.Note.create({
-      name: form.get("name"),
-      description: form.get("description"),
-      image: form.get("image").name,
+      name: form.get("name") as string,
+      description: form.get("description") as string,
+      image: imageFile.name,
     });
 
     console.log(newNote);
-    if (newNote.image)
-      if (newNote.image)
-        await uploadData({
-          path: ({ identityId }) => `media/${identityId}/${newNote.image}`,
-          data: form.get("image"),
-        }).result;
+    if (newNote && newNote.image)
+      await uploadData({
+        path: ({ identityId }) => `media/${identityId}/${newNote.image}`,
+        data: imageFile,
+      }).result;
 
     fetchNotes();
-    event.target.reset();
-  }
+    (event.target as HTMLFormElement).reset();
+  };
 
-  async function deleteNote({ id }) {
-    const toBeDeletedNote = {
+  const deleteNote = async ({ id }: DeleteNoteParams): Promise<void> => {
+    const toBeDeletedNote: DeleteNoteParams = {
       id: id,
     };
 
@@ -86,11 +97,11 @@ export default function App() {
     console.log(deletedNote);
 
     fetchNotes();
-  }
+  };
 
   return (
     <Authenticator>
-      {({ signOut }) => (
+      {({ signOut }: { signOut?: () => void }) => (
         <Flex
           className="App"
           justifyContent="center"
@@ -158,13 +169,13 @@ export default function App() {
                 className="box"
               >
                 <View>
-                  <Heading level="3">{note.name}</Heading>
+                  <Heading level={3}>{note.name}</Heading>
                 </View>
                 <Text fontStyle="italic">{note.description}</Text>
                 {note.image && (
                   <Image
                     src={note.image}
-                    alt={`visual aid for ${notes.name}`}
+                    alt={`visual aid for ${note.name}`}
                     style={{ width: 400 }}
                   />
                 )}
@@ -182,4 +193,6 @@ export default function App() {
       )}
     </Authenticator>
   );
-}
+};
+
+export default App;
