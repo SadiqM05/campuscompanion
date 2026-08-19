@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { NavLink } from "react-router-dom";
-import { LogOut, Notebook, Settings as SettingsIcon } from "lucide-react";
+import { LogOut, Notebook, Settings as SettingsIcon, Timer, Wallet } from "lucide-react";
 import { cn } from "../../lib/cn";
 
 interface SidebarProps {
@@ -9,6 +9,8 @@ interface SidebarProps {
 
 const navItems = [
   { to: "/notes", label: "Notes", icon: Notebook },
+  { to: "/pomodoro", label: "Pomodoro", icon: Timer },
+  { to: "/budget", label: "Budget", icon: Wallet },
   { to: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 

@@ -7,7 +7,12 @@ import outputs from "../amplify_outputs.json";
 import { ThemeProvider } from "./context/ThemeProvider";
 import { useTheme } from "./hooks/useTheme";
 import Layout from "./components/layout/Layout";
+import BudgetLayout from "./features/budget/BudgetLayout";
+import BudgetOverviewPage from "./features/budget/BudgetOverviewPage";
+import PurchaseGoalsPage from "./features/budget/PurchaseGoalsPage";
+import CurrentSavingsPage from "./features/budget/CurrentSavingsPage";
 import NotesPage from "./features/notes/NotesPage";
+import PomodoroPage from "./features/pomodoro/PomodoroPage";
 import SettingsPage from "./features/settings/SettingsPage";
 import { amplifyTheme } from "./theme/amplifyTheme";
 
@@ -30,6 +35,12 @@ const ThemedApp: FC<ThemedAppProps> = ({ signOut }) => {
           <Route element={<Layout signOut={signOut} />}>
             <Route index element={<Navigate to="/notes" replace />} />
             <Route path="notes" element={<NotesPage />} />
+            <Route path="pomodoro" element={<PomodoroPage />} />
+            <Route path="budget" element={<BudgetLayout />}>
+              <Route index element={<BudgetOverviewPage />} />
+              <Route path="goals" element={<PurchaseGoalsPage />} />
+              <Route path="savings" element={<CurrentSavingsPage />} />
+            </Route>
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>
